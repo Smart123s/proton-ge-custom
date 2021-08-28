@@ -2,51 +2,6 @@
 
 ### (1) PREP SECTION ###
 
-    cd gst-plugins-base
-    git reset --hard HEAD
-    git clean -xdf
-    echo "add Guy's patch for gstreamer preroll buffer for media converter"
-    patch -Np1 < ../patches/gstreamer/mediaconvert-gstdecodebin2.patch
-    cd ..
-
-    cd gst-plugins-ugly
-    git reset --hard HEAD
-    git clean -xdf
-    echo "add Guy's patch to fix wmv playback in gst-plugins-ugly"
-    patch -Np1 < ../patches/gstreamer/asfdemux-Re-initialize_demux-adapter_in_gst_asf_demux_reset.patch
-    patch -Np1 < ../patches/gstreamer/asfdemux-gst_asf_demux_reset_GST_FORMAT_TIME_fix.patch
-    cd ..
-
-    cd vkd3d-proton
-    git reset --hard HEAD
-    git clean -xdf
-
-    echo "add pending resizable bar PR"
-    patch -Np1 < ../patches/vkd3d/741.patch
-
-    echo "diablo 2 dx12 hotfix"
-    patch -Np1 < ../patches/vkd3d/767.patch
-    cd ..
-
-    cd dxvk
-    git reset --hard HEAD
-    git clean -xdf
-
-    echo "add valve dxvk patches"
-    patch -Np1 < ../patches/dxvk/proton-dxvk_avoid_spamming_log_with_requests_for_IWineD3D11Texture2D.patch
-    patch -Np1 < ../patches/dxvk/proton-dxvk_add_new_dxvk_config_library.patch
-
-    echo "proton re8 fixups"
-    patch -Np1 < ../patches/dxvk/RE8_proton_fixups.patch
-
-    echo "ffxiv hotfix https://github.com/doitsujin/dxvk/issues/2210"
-    patch -Np1 < ../patches/dxvk/ffxiv-framelatency.patch
-
-    # this needs to be the last patch in the list.. because reasons?
-    echo "add dxvk async patch"
-    patch -Np1 < ../patches/dxvk/dxvk-async.patch
-    cd ..
-
     #WINE STAGING
     cd wine-staging
     git reset --hard HEAD
@@ -178,45 +133,11 @@
 
 ### END WINE STAGING APPLY SECTION ###
 
-### (2-3) GAME PATCH SECTION ###
-
-    echo "mech warrior online"
-    patch -Np1 < ../patches/game-patches/mwo.patch
-
-    echo "ffxiv launcher"
-    patch -Np1 < ../patches/game-patches/ffxiv-launcher-workaround.patch
-
-    echo "assetto corsa"
-    patch -Np1 < ../patches/game-patches/assettocorsa-hud.patch
-
-    # TODO: Add game-specific check
-    echo "mk11 patch"
-    patch -Np1 < ../patches/game-patches/mk11.patch
-
-#    BLOPS2 uses CEG which does not work in proton. Disabled for now
-#    echo "blackops 2 fix"
-#    patch -Np1 < ../patches/game-patches/blackops_2_fix.patch
-
-    echo "killer instinct vulkan fix"
-    patch -Np1 < ../patches/game-patches/killer-instinct-winevulkan_fix.patch
-
-### END GAME PATCH SECTION ###
-
 ### (2-4) PROTON PATCH SECTION ###
 
     echo "applying __wine_make_process_system_restore revert for steamclient compatibility"
     # revert this, it breaks lsteamclient compilation
     patch -RNp1 < ../patches/wine-hotfixes/steamclient/__wine_make_process_system_restore.patch
-
-    echo "clock monotonic"
-    patch -Np1 < ../patches/proton/01-proton-use_clock_monotonic.patch
-
-    #WINE FSYNC
-    echo "applying fsync patches"
-    patch -Np1 < ../patches/proton/03-proton-fsync_staging.patch
-
-    echo "LAA"
-    patch -Np1 < ../patches/proton/04-proton-LAA_staging.patch
 
     echo "steamclient swap"
     patch -Np1 < ../patches/proton/08-proton-steamclient_swap.patch
@@ -230,80 +151,14 @@
     echo "steam bits"
     patch -Np1 < ../patches/proton/12-proton-steam-bits.patch
 
-    echo "proton SDL patches"
-    patch -Np1 < ../patches/proton/14-proton-sdl-joy.patch
-
-    echo "Valve VR patches"
-    patch -Np1 < ../patches/proton/16-proton-vrclient-wined3d.patch
-
-    echo "amd ags"
-    patch -Np1 < ../patches/proton/18-proton-amd_ags.patch
-
-    echo "msvcrt overrides"
-    patch -Np1 < ../patches/proton/19-proton-msvcrt_nativebuiltin.patch
-
-    echo "atiadlxx needed for cod games"
-    patch -Np1 < ../patches/proton/20-proton-atiadlxx.patch
-
-    echo "valve registry entries"
-    patch -Np1 < ../patches/proton/21-proton-01_wolfenstein2_registry.patch
-    patch -Np1 < ../patches/proton/22-proton-02_rdr2_registry.patch
-    patch -Np1 < ../patches/proton/23-proton-03_nier_sekiro_ds3_registry.patch
-    patch -Np1 < ../patches/proton/24-proton-04_cod_registry.patch
-    patch -Np1 < ../patches/proton/32-proton-05_spellforce_registry.patch
-    patch -Np1 < ../patches/proton/33-proton-06_shadow_of_war_registry.patch
-    patch -Np1 < ../patches/proton/41-proton-07_nfs_registry.patch
-    patch -Np1 < ../patches/proton/45-proton-08_FH4_registry.patch
-    patch -Np1 < ../patches/proton/46-proton-09_nvapi_registry.patch
-    patch -Np1 < ../patches/proton/47-proton-10_dirt_5_registry.patch
-
-    echo "valve rdr2 fixes"
-    patch -Np1 < ../patches/proton/25-proton-rdr2-fixes.patch
-
-    echo "apply staging bcrypt patches on top of rdr2 fixes"
-    patch -Np1 < ../patches/wine-hotfixes/staging/0001-bcrypt-Allow-multiple-backends-to-coexist.patch
-    patch -Np1 < ../patches/wine-hotfixes/staging/0002-bcrypt-Implement-BCryptSecretAgreement-with-libgcryp.patch
-
-    echo "set prefix win10"
-    patch -Np1 < ../patches/proton/28-proton-win10_default.patch
-
-    echo "dxvk_config"
-    patch -Np1 < ../patches/proton/29-proton-dxvk_config.patch
-
-    #this is needed specifically for proton, not needed for normal wine
-    echo "proton-specific manual mfplat dll register patch"
-    patch -Np1 < ../patches/proton/30-proton-mediafoundation_dllreg.patch
-
-    echo "proton-specific mfplat video conversion patches"
-    patch -Np1 < ../patches/proton/34-proton-winegstreamer_updates.patch
-
     echo "mouse focus fixes"
     patch -Np1 < ../patches/proton/38-proton-mouse-focus-fixes.patch
-
-    echo "CPU topology overrides"
-    patch -Np1 < ../patches/proton/39-proton-cpu-topology-overrides.patch
-
-    echo "proton futex2 patches"
-    patch -Np1 < ../patches/proton/40-proton-futex2.patch
 
     echo "fullscreen hack"
     patch -Np1 < ../patches/proton/41-valve_proton_fullscreen_hack-staging-tkg.patch
 
-    echo "fullscreen hack fsr patch"
-    patch -Np1 < ../patches/proton/48-proton-fshack_amd_fsr.patch
-
-    echo "proton QPC performance patch"
-    patch -Np1 < ../patches/proton/49-proton_QPC.patch
-
-    echo "proton LFH performance patch"
-    patch -Np1 < ../patches/proton/50-proton_LFH.patch
-
     echo "proton font patches"
     patch -Np1 < ../patches/proton/51-proton_fonts.patch
-
-#    disabled for now, needs rebase. only used for vr anyway
-#    echo "proton openxr patches"
-#    patch -Np1 < ../patches/proton/37-proton-OpenXR-patches.patch
 
 ### END PROTON PATCH SECTION ###
 
