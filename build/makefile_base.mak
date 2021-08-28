@@ -256,8 +256,6 @@ DIST_COPY_TARGETS := $(FILELOCK_TARGET) $(PROTON_PY_TARGET) \
                      $(PROTONFIXES_TARGET)
 
 DIST_VERSION := $(DST_BASE)/version
-DIST_OVR32 := $(DST_LIBDIR32)/wine/dxvk/openvr_api_dxvk.dll
-DIST_OVR64 := $(DST_LIBDIR64)/wine/dxvk/openvr_api_dxvk.dll
 DIST_PREFIX := $(DST_DIR)/share/default_pfx/
 DIST_COMPAT_MANIFEST := $(DST_BASE)/compatibilitytool.vdf
 DIST_LICENSE := $(DST_BASE)/LICENSE
@@ -269,8 +267,6 @@ DIST_GECKO64 := $(DIST_GECKO_DIR)/wine-gecko-$(GECKO_VER)-x86_64
 DIST_WINEMONO_DIR := $(DST_DIR)/share/wine/mono
 DIST_WINEMONO := $(DIST_WINEMONO_DIR)/wine-mono-$(WINEMONO_VER)
 DIST_FONTS := $(DST_DIR)/share/fonts
-DIST_WINEOPENXR_JSON64 := $(DIST_PREFIX)/drive_c/openxr/wineopenxr64.json
-DIST_WINEOPENXR64 := $(DIST_PREFIX)/drive_c/windows/system32/wineopenxr.dll
 
 DIST_TARGETS := $(DIST_COPY_TARGETS) $(DIST_OVR32) $(DIST_OVR64) \
                 $(DIST_GECKO32) $(DIST_GECKO64) $(DIST_WINEMONO) \
@@ -287,14 +283,6 @@ $(DIST_TOOLMANIFEST): $(addprefix $(SRCDIR)/,$(TOOLMANIFEST_VDF_SRC))
 	cp -a $< $@
 
 $(DIST_OFL_LICENSE): $(OFL_LICENSE)
-	cp -a $< $@
-
-$(DIST_OVR32): $(SRCDIR)/openvr/bin/win32/openvr_api.dll | $(DST_DIR)
-	mkdir -p $(DST_LIBDIR32)/wine/dxvk
-	cp -a $< $@
-
-$(DIST_OVR64): $(SRCDIR)/openvr/bin/win64/openvr_api.dll | $(DST_DIR)
-	mkdir -p $(DST_LIBDIR64)/wine/dxvk
 	cp -a $< $@
 
 $(DIST_COPY_TARGETS): | $(DST_DIR)
@@ -365,9 +353,7 @@ dist_prefix: wine gst_good
 	rm -rf $(abspath $(DIST_PREFIX))
 	python3 $(SRCDIR)/default_pfx.py $(abspath $(DIST_PREFIX)) $(abspath $(DST_DIR)) $(STEAM_RUNTIME_RUNSH)
 
-dist_wineopenxr: dist_prefix $(DIST_WINEOPENXR_JSON64)
-
-dist: $(DIST_TARGETS) all-dist dist_wineopenxr | $(DST_DIR)
+dist: $(DIST_TARGETS) all-dist | $(DST_DIR)
 	echo `date '+%s'` `GIT_DIR=$(abspath $(SRCDIR)/.git) git describe --tags` > $(DIST_VERSION)
 
 deploy: dist | $(filter-out dist deploy install redist,$(MAKECMDGOALS))
@@ -664,39 +650,6 @@ $(eval $(call rules-source,lsteamclient,$(SRCDIR)/lsteamclient))
 $(eval $(call rules-winemaker,lsteamclient,32,lsteamclient.dll))
 $(eval $(call rules-winemaker,lsteamclient,64,lsteamclient.dll))
 
-
-##
-
-##
-## openxr
-## Note 32-bit is not supported by SteamVR, so we don't build it.
-##
-
-OPENXR_CMAKE_ARGS = -DHAVE_FILESYSTEM_WITHOUT_LIB=0
-
-$(eval $(call rules-source,openxr,$(SRCDIR)/OpenXR-SDK))
-# $(eval $(call rules-cmake,openxr,32))
-$(eval $(call rules-cmake,openxr,64))
-
-
-##
-## wineopenxr
-## Note 32-bit is not supported by SteamVR, so we don't build it.
-##
-
-WINEOPENXR_LDFLAGS = -lopenxr_loader -ldxgi -lvulkan
-
-WINEOPENXR_DEPENDS = wine openxr
-
-$(eval $(call rules-source,wineopenxr,$(SRCDIR)/wineopenxr))
-# $(eval $(call rules-winemaker,wineopenxr,32,wineopenxr.dll))
-$(eval $(call rules-winemaker,wineopenxr,64,wineopenxr.dll))
-
-$(DIST_WINEOPENXR_JSON64): $(WINEOPENXR_SRC)/wineopenxr64.json dist_prefix
-	mkdir -p $(dir $@)
-	cp -a $< $@
-
-
 ##
 ## steam.exe
 ##
@@ -707,7 +660,6 @@ STEAMEXE_LDFLAGS = -lsteam_api -lole32 -ldl -static-libgcc -static-libstdc++
 
 STEAMEXE_WINEMAKER_ARGS = \
 	"-I$(SRC)/lsteamclient/steamworks_sdk_142/" \
-	"-I$(SRC)/openvr/headers/" \
 	"-L$(SRC)/steam_helper/"
 
 STEAMEXE_DEPENDS = wine
