@@ -157,9 +157,6 @@
     echo "fullscreen hack"
     patch -Np1 < ../patches/proton/41-valve_proton_fullscreen_hack-staging-tkg.patch
 
-    echo "proton font patches"
-    patch -Np1 < ../patches/proton/51-proton_fonts.patch
-
 ### END PROTON PATCH SECTION ###
 
 ### (2-5) WINE HOTFIX SECTION ###
