@@ -184,7 +184,6 @@ CARGO_BUILD_ARG := --release
 
 COMPAT_MANIFEST_TEMPLATE := $(SRCDIR)/compatibilitytool.vdf.template
 LICENSE := $(SRCDIR)/dist.LICENSE
-OFL_LICENSE := $(SRCDIR)/fonts/liberation-fonts/LICENSE
 STEAMPIPE_FIXUPS_PY := $(SRCDIR)/steampipe_fixups.py
 
 GECKO_VER := 2.47.2
@@ -193,9 +192,6 @@ GECKO64_TARBALL := wine-gecko-$(GECKO_VER)-x86_64.tar.xz
 
 WINEMONO_VER := 6.3.0
 WINEMONO_TARBALL := wine-mono-$(WINEMONO_VER)-x86.tar.xz
-
-FONTS := $(SRCDIR)/fonts
-FONTS_OBJ := ./obj-fonts
 
 ifeq ($(CONTAINER),)
 
@@ -266,11 +262,10 @@ DIST_GECKO32 := $(DIST_GECKO_DIR)/wine-gecko-$(GECKO_VER)-x86
 DIST_GECKO64 := $(DIST_GECKO_DIR)/wine-gecko-$(GECKO_VER)-x86_64
 DIST_WINEMONO_DIR := $(DST_DIR)/share/wine/mono
 DIST_WINEMONO := $(DIST_WINEMONO_DIR)/wine-mono-$(WINEMONO_VER)
-DIST_FONTS := $(DST_DIR)/share/fonts
 
 DIST_TARGETS := $(DIST_COPY_TARGETS) $(DIST_OVR32) $(DIST_OVR64) \
                 $(DIST_GECKO32) $(DIST_GECKO64) $(DIST_WINEMONO) \
-                $(DIST_COMPAT_MANIFEST) $(DIST_LICENSE) $(DIST_TOOLMANIFEST) $(DIST_OFL_LICENSE) $(DIST_FONTS)
+                $(DIST_COMPAT_MANIFEST) $(DIST_LICENSE) $(DIST_TOOLMANIFEST) $(DIST_OFL_LICENSE)
 
 BASE_COPY_TARGETS := $(DIST_COPY_TARGETS) $(DIST_VERSION) $(DIST_LICENSE) $(DIST_TOOLMANIFEST) $(DIST_OFL_LICENSE) $(DST_DIR)
 DEPLOY_COPY_TARGETS := $(BASE_COPY_TARGETS) $(STEAMPIPE_FIXUPS_PY)
@@ -332,15 +327,6 @@ $(DIST_WINEMONO): | $(DIST_WINEMONO_DIR)
 		fi; \
 		tar -xf "$(SRCDIR)/contrib/$(WINEMONO_TARBALL)" -C "$(dir $@)"; \
 	fi
-
-$(DIST_FONTS): fonts
-	mkdir -p $@
-	cp $(FONTS_OBJ)/*.ttf "$@"
-	cp $(FONTS_OBJ)/source-han/msyh.ttf "$@"
-	cp $(FONTS_OBJ)/source-han/simsun.ttc "$@"
-	cp $(FONTS_OBJ)/source-han/msgothic.ttc "$@"
-	cp $(FONTS_OBJ)/source-han/malgun.ttf "$@"
-	cp $(FONTS)/noto/NotoSansArabic-Regular.ttf "$@"
 
 .PHONY: dist
 
@@ -870,130 +856,6 @@ $(OBJ)/.vkd3d-proton-post-build64:
 ## 	cp -a $(MEDIACONV_OBJ32)/i686-unknown-linux-gnu/release/libprotonmediaconverter.so $(MEDIACONV_DST32)/lib/gstreamer-1.0/
 ## 	touch $@
 ##
-
-ifeq ($(CONTAINER),)
-ALL_TARGETS += fonts
-GOAL_TARGETS += fonts
-
-.PHONY: fonts
-
-FONTFORGE = fontforge -quiet
-FONTSCRIPT = $(FONTS)/scripts/generatefont.pe
-
-LIBERATION_SRCDIR = $(FONTS)/liberation-fonts/src
-SOURCE_HAN_SANS_SRCDIR = $(FONTS)/source-han-sans
-
-msyh.ttf_CIDFONTINFO = $(SOURCE_HAN_SANS_SRCDIR)/cidfontinfo.OTC.SC
-msyh.ttf_CIDFONT = $(SOURCE_HAN_SANS_SRCDIR)/cidfont.ps.OTC.SC
-msyh.ttf_FEATURES = $(SOURCE_HAN_SANS_SRCDIR)/features.OTC.SC
-msyh.ttf_SEQUENCES = $(SOURCE_HAN_SANS_SRCDIR)/SourceHanSans_CN_sequences.txt
-msyh.ttf_UNISOURCE = $(SOURCE_HAN_SANS_SRCDIR)/UniSourceHanSansCN-UTF32-H
-msyh.ttf_MENUNAMEDB = $(FONTS)/patches/YaHei-FontMenuNameDB
-msyh.ttf = $(FONTS_OBJ)/source-han/msyh.ttf
-
-simsun.ttf_CIDFONTINFO = $(SOURCE_HAN_SANS_SRCDIR)/cidfontinfo.OTC.SC
-simsun.ttf_CIDFONT = $(SOURCE_HAN_SANS_SRCDIR)/cidfont.ps.OTC.SC
-simsun.ttf_FEATURES = $(SOURCE_HAN_SANS_SRCDIR)/features.OTC.SC
-simsun.ttf_SEQUENCES = $(SOURCE_HAN_SANS_SRCDIR)/SourceHanSans_CN_sequences.txt
-simsun.ttf_UNISOURCE = $(SOURCE_HAN_SANS_SRCDIR)/UniSourceHanSansCN-UTF32-H
-simsun.ttf_MENUNAMEDB = $(FONTS)/patches/SimSun-FontMenuNameDB
-simsun.ttf = $(FONTS_OBJ)/source-han/simsun.ttf
-
-nsimsun.ttf_CIDFONTINFO = $(SOURCE_HAN_SANS_SRCDIR)/cidfontinfo.OTC.SC
-nsimsun.ttf_CIDFONT = $(SOURCE_HAN_SANS_SRCDIR)/cidfont.ps.OTC.SC
-nsimsun.ttf_FEATURES = $(SOURCE_HAN_SANS_SRCDIR)/features.OTC.SC
-nsimsun.ttf_SEQUENCES = $(SOURCE_HAN_SANS_SRCDIR)/SourceHanSans_CN_sequences.txt
-nsimsun.ttf_UNISOURCE = $(SOURCE_HAN_SANS_SRCDIR)/UniSourceHanSansCN-UTF32-H
-nsimsun.ttf_MENUNAMEDB = $(FONTS)/patches/NSimSun-FontMenuNameDB
-nsimsun.ttf = $(FONTS_OBJ)/source-han/nsimsun.ttf
-
-msgothic.ttf_CIDFONTINFO = $(SOURCE_HAN_SANS_SRCDIR)/cidfontinfo.OTC.J
-msgothic.ttf_CIDFONT = $(SOURCE_HAN_SANS_SRCDIR)/cidfont.ps.OTC.J
-msgothic.ttf_FEATURES = $(SOURCE_HAN_SANS_SRCDIR)/features.OTC.J
-msgothic.ttf_SEQUENCES = $(SOURCE_HAN_SANS_SRCDIR)/SourceHanSans_JP_sequences.txt
-msgothic.ttf_UNISOURCE = $(SOURCE_HAN_SANS_SRCDIR)/UniSourceHanSansJP-UTF32-H
-msgothic.ttf_MENUNAMEDB = $(FONTS)/patches/MSGothic-FontMenuNameDB
-msgothic.ttf = $(FONTS_OBJ)/source-han/msgothic.ttf
-
-mspgothic.ttf_CIDFONTINFO = $(SOURCE_HAN_SANS_SRCDIR)/cidfontinfo.OTC.J
-mspgothic.ttf_CIDFONT = $(SOURCE_HAN_SANS_SRCDIR)/cidfont.ps.OTC.J
-mspgothic.ttf_FEATURES = $(SOURCE_HAN_SANS_SRCDIR)/features.OTC.J
-mspgothic.ttf_SEQUENCES = $(SOURCE_HAN_SANS_SRCDIR)/SourceHanSans_JP_sequences.txt
-mspgothic.ttf_UNISOURCE = $(SOURCE_HAN_SANS_SRCDIR)/UniSourceHanSansJP-UTF32-H
-mspgothic.ttf_MENUNAMEDB = $(FONTS)/patches/MSPGothic-FontMenuNameDB
-mspgothic.ttf = $(FONTS_OBJ)/source-han/mspgothic.ttf
-
-msuigothic.ttf_CIDFONTINFO = $(SOURCE_HAN_SANS_SRCDIR)/cidfontinfo.OTC.J
-msuigothic.ttf_CIDFONT = $(SOURCE_HAN_SANS_SRCDIR)/cidfont.ps.OTC.J
-msuigothic.ttf_FEATURES = $(SOURCE_HAN_SANS_SRCDIR)/features.OTC.J
-msuigothic.ttf_SEQUENCES = $(SOURCE_HAN_SANS_SRCDIR)/SourceHanSans_JP_sequences.txt
-msuigothic.ttf_UNISOURCE = $(SOURCE_HAN_SANS_SRCDIR)/UniSourceHanSansJP-UTF32-H
-msuigothic.ttf_MENUNAMEDB = $(FONTS)/patches/MSUIGothic-FontMenuNameDB
-msuigothic.ttf = $(FONTS_OBJ)/source-han/msuigothic.ttf
-
-malgun.ttf_CIDFONTINFO = $(SOURCE_HAN_SANS_SRCDIR)/cidfontinfo.OTC.K
-malgun.ttf_CIDFONT = $(SOURCE_HAN_SANS_SRCDIR)/cidfont.ps.OTC.K
-malgun.ttf_FEATURES = $(SOURCE_HAN_SANS_SRCDIR)/features.OTC.K
-malgun.ttf_SEQUENCES = $(SOURCE_HAN_SANS_SRCDIR)/SourceHanSans_KR_sequences.txt
-malgun.ttf_UNISOURCE = $(SOURCE_HAN_SANS_SRCDIR)/UniSourceHanSansKR-UTF32-H
-malgun.ttf_MENUNAMEDB = $(FONTS)/patches/Malgun-FontMenuNameDB
-malgun.ttf = $(FONTS_OBJ)/source-han/malgun.ttf
-
-simsun.ttc = $(FONTS_OBJ)/source-han/simsun.ttc
-msgothic.ttc = $(FONTS_OBJ)/source-han/msgothic.ttc
-
-#The use of "Arial" here is for compatibility with programs that require that exact string. This font is not Arial.
-LiberationSans-Regular_NAMES := "Arial" "Arial" "Arial"
-#The use of "Arial" here is for compatibility with programs that require that exact string. This font is not Arial.
-LiberationSans-Bold_NAMES := "Arial-Bold" "Arial" "Arial Bold"
-#The use of "Times New Roman" here is for compatibility with programs that require that exact string. This font is not Times New Roman.
-LiberationSerif-Regular_NAMES := "TimesNewRoman" "Times New Roman" "Times New Roman"
-#The use of "Courier New" here is for compatibility with programs that require that exact string. This font is not Courier New.
-LiberationMono-Regular_NAMES := "CourierNew" "Courier New" "Courier New"
-LiberationMono-Regular_PATCH := $(FONTS)/patches/LiberationMono-Regular.patch
-#The use of "Courier New" here is for compatibility with programs that require that exact string. This font is not Courier New.
-LiberationMono-Bold_NAMES := "CourierNewPS-BoldMT" "Courier New" "Courier New Bold"
-
-$(FONTS_OBJ):
-	mkdir -p $@
-
-$(FONTS_OBJ)/%.ttf: $(FONTS_OBJ)/%.sfd $(FONTSCRIPT) | $(FONTS_OBJ)
-	$(FONTFORGE) -script $(FONTSCRIPT) $< $($(*)_NAMES)
-
-$(FONTS_OBJ)/%.sfd: $(LIBERATION_SRCDIR)/%.sfd | $(FONTS_OBJ)
-	patch $< -o $@ $(firstword $($(*)_PATCH) /dev/null)
-
-#The use of "YaHei" for compatibility with programs that require that exact string. This font is not Microsoft YaHei.
-$(FONTS_OBJ)/source-han/%.ttf: $$(%.ttf_CIDFONTINFO) $$(%.ttf_CIDFONTINFO) $$(%.ttf_CIDFONT) \
-		$$(%.ttf_FEATURES) $$(%.ttf_SEQUENCES) $$(%.ttf_UNISOURCE) $$(%.ttf_MENUNAMEDB)
-	mkdir -p $(FONTS_OBJ)/source-han
-	# Do not immediately create the target file, so that make is interrupted
-	# it will restart again
-	$(AFDKO_VERB) makeotf -f $($(notdir $@)_CIDFONT) -omitMacNames -ff $($(notdir $@)_FEATURES) \
-		-fi $($(notdir $@)_CIDFONTINFO) -mf $($(notdir $@)_MENUNAMEDB) -r -nS -cs 25 -ch $($(notdir $@)_UNISOURCE) \
-		-ci $($(notdir $@)_SEQUENCES) -o $@.tmp
-	$(AFDKO_VERB) tx -cff +S -no_futile $($(notdir $@)_CIDFONT) $@.cff
-	# sftnedit uses a hardcoded temporary file in the local directory, so we have
-	# to run it in a dedicated temporary directory to prevent concurrent instances
-	# to step onto each other's feet
-	(TEMP_DIR=`mktemp -d` && cd $$TEMP_DIR && $(AFDKO_VERB) sfntedit -a CFF=$(abspath $($(notdir $@)).cff) $(abspath $@.tmp) && rm -fr $$TEMP_DIR)
-	mv $@.tmp $@
-
-$(simsun.ttc): $(simsun.ttf) $(nsimsun.ttf)
-	$(AFDKO_VERB) otf2otc -o $@ $^
-
-$(msgothic.ttc): $(msgothic.ttf) $(mspgothic.ttf) $(msuigothic.ttf)
-	$(AFDKO_VERB) otf2otc -o $@ $^
-
-fonts: $(FONTS_OBJ)/LiberationSans-Regular.ttf
-fonts: $(FONTS_OBJ)/LiberationSans-Bold.ttf
-fonts: $(FONTS_OBJ)/LiberationSerif-Regular.ttf
-fonts: $(FONTS_OBJ)/LiberationMono-Regular.ttf
-fonts: $(FONTS_OBJ)/LiberationMono-Bold.ttf
-fonts: $(msyh.ttf)
-fonts: $(simsun.ttc)
-fonts: $(msgothic.ttc)
-fonts: $(malgun.ttf)
 
 ##
 ## Targets
