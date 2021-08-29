@@ -857,6 +857,8 @@ $(OBJ)/.vkd3d-proton-post-build64:
 ## 	touch $@
 ##
 
+ifeq ($(CONTAINER),)
+
 ##
 ## Targets
 ##
