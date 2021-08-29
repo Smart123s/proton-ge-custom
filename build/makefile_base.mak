@@ -353,7 +353,10 @@ dist_prefix: wine gst_good
 	rm -rf $(abspath $(DIST_PREFIX))
 	python3 $(SRCDIR)/default_pfx.py $(abspath $(DIST_PREFIX)) $(abspath $(DST_DIR)) $(STEAM_RUNTIME_RUNSH)
 
-dist: $(DIST_TARGETS) all-dist | $(DST_DIR)
+# Dummy OpenXR
+dist_wineopenxr: dist_prefix
+
+dist: $(DIST_TARGETS) all-dist dist_wineopenxr | $(DST_DIR)
 	echo `date '+%s'` `GIT_DIR=$(abspath $(SRCDIR)/.git) git describe --tags` > $(DIST_VERSION)
 
 deploy: dist | $(filter-out dist deploy install redist,$(MAKECMDGOALS))
