@@ -259,7 +259,7 @@ DIST_GECKO64 := $(DIST_GECKO_DIR)/wine-gecko-$(GECKO_VER)-x86_64
 DIST_WINEMONO_DIR := $(DST_DIR)/share/wine/mono
 DIST_WINEMONO := $(DIST_WINEMONO_DIR)/wine-mono-$(WINEMONO_VER)
 
-DIST_TARGETS := $(DIST_COPY_TARGETS) $(DIST_OVR32) $(DIST_OVR64) \
+DIST_TARGETS := $(DIST_COPY_TARGETS) \
                 $(DIST_GECKO32) $(DIST_GECKO64) $(DIST_WINEMONO) \
                 $(DIST_COMPAT_MANIFEST) $(DIST_LICENSE) $(DIST_TOOLMANIFEST)
 
@@ -326,7 +326,7 @@ $(DIST_WINEMONO): | $(DIST_WINEMONO_DIR)
 ALL_TARGETS += dist
 GOAL_TARGETS += dist
 
-dist_prefix: wine gst_good
+dist_prefix: wine
 	find $(DST_LIBDIR32)/wine -type f -execdir chmod a-w '{}' '+'
 	find $(DST_LIBDIR64)/wine -type f -execdir chmod a-w '{}' '+'
 	rm -rf $(abspath $(DIST_PREFIX))
@@ -335,7 +335,7 @@ dist_prefix: wine gst_good
 # Dummy OpenXR
 dist_wineopenxr: dist_prefix
 
-dist: $(DIST_TARGETS) all-dist dist_wineopenxr | $(DST_DIR)
+dist: $(DIST_TARGETS) all-dist | $(DST_DIR)
 	echo `date '+%s'` `GIT_DIR=$(abspath $(SRCDIR)/.git) git describe --tags` > $(DIST_VERSION)
 
 deploy: dist | $(filter-out dist deploy install redist,$(MAKECMDGOALS))
